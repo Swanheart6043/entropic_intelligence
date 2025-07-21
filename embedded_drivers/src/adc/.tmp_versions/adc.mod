@@ -1,0 +1,2 @@
+/home/swanheart/codes/SmartHome/embedded_drivers/src/adc/adc.ko
+/home/swanheart/codes/SmartHome/embedded_drivers/src/adc/adc.o
