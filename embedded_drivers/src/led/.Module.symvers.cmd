@@ -1,1 +1,0 @@
-savedcmd_/home/swanheart/codes/drivers/led/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/swanheart/codes/drivers/led/Module.symvers -T /home/swanheart/codes/drivers/led/modules.order -i Module.symvers -e 

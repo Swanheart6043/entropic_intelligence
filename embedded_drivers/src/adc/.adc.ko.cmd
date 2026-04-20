@@ -1,1 +1,0 @@
-cmd_/home/swanheart/codes/SmartHome/embedded_drivers/src/adc/adc.ko := arm-none-linux-gnueabi-ld -EL -r  -T /home/swanheart/codes/linux-3.14/scripts/module-common.lds --build-id  -o /home/swanheart/codes/SmartHome/embedded_drivers/src/adc/adc.ko /home/swanheart/codes/SmartHome/embedded_drivers/src/adc/adc.o /home/swanheart/codes/SmartHome/embedded_drivers/src/adc/adc.mod.o
