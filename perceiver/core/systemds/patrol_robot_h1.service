@@ -1,0 +1,19 @@
+[Unit]
+Description=patrol robot h1 Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=heyn
+WorkingDirectory=/home/heyn/patrol_robot_h1/src
+ExecStart=/usr/bin/python3 /home/heyn/patrol_robot_h1/src/patrol_robot_h1.py
+Environment="LD_LIBRARY_PATH=/usr/hobot/lib:/app/lib:/app/pub/lib:/middleware/lib:/middleware/pub/lib:/usr/hobot/lib/sensor:/system/lib:/system/usr/lib:/lib"
+
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

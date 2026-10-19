@@ -1,0 +1,19 @@
+[Unit]
+Description=edge_gateway
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/heyn/patrol_robot_h1
+ExecStart=/home/heyn/patrol_robot_h1/edge_gateway
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=30
+TimeoutStopSec=15
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target patrol_robot_h1.target

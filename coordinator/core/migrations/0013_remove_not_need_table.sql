@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS alert_config;
+DROP TABLE IF EXISTS vds_config;

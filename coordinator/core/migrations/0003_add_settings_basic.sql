@@ -1,0 +1,1 @@
+INSERT IGNORE INTO settings_basic (config_key, config_value, description) VALUES ('remote_open_door_customer', '', '远程开门的客户');

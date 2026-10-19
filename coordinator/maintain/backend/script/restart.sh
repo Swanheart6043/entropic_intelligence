@@ -1,0 +1,1 @@
+sudo systemctl restart patrol_robot_h1_maintain.service

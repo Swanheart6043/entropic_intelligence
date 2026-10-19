@@ -1,0 +1,19 @@
+[Unit]
+Description=task_center
+After=network-online.target mysql.service web_gateway.service
+Wants=network-online.target web_gateway.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/heyn/patrol_robot_h1
+ExecStart=/home/heyn/patrol_robot_h1/task_center
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=30
+TimeoutStopSec=15
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target patrol_robot_h1.target

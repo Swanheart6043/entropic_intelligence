@@ -1,0 +1,18 @@
+[Unit]
+Description=Robot network evidence collector
+After=local-fs.target systemd-journald.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python3 /home/heyn/patrol_robot_h1/tools/collect_network_evidence.py
+Restart=on-failure
+RestartSec=10
+Nice=10
+IOSchedulingClass=idle
+UMask=0077
+NoNewPrivileges=true
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

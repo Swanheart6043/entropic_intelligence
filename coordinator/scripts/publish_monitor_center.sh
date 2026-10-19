@@ -1,0 +1,1 @@
+scp -P 31210 /home/heyn/patrol_robot_coordinator/coordinator/services/monitor_center/build/monitor_center heyn@36.134.171.85:/home/heyn/patrol_robot_h1

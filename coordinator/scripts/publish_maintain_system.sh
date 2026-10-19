@@ -1,0 +1,1 @@
+scp -P 31210 -r /home/heyn/patrol_robot_coordinator/maintain/backend/dist/runtime heyn@36.134.171.85:/home/heyn/patrol_robot_h1_maintain
