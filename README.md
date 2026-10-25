@@ -28,8 +28,8 @@ RK3568板子，STM32板子，英伟达板子，云台，摄像头，路由器
 名称: perceiver (感知层RK3568)  
 功能: 实时推理
 
-	core
-	maintain
+	src
+	tests
 
 cognition（认知层nvidia jetson nano）
 
@@ -56,5 +56,5 @@ cognition（认知层nvidia jetson nano）
 	密码: 无
 
 	认知层 10.168.1.30  
-	账号: 无
+	账号: 
 	密码: 无
