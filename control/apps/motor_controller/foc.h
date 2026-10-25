@@ -60,7 +60,7 @@ typedef struct {
 
 extern foc_t g_foc;
 
-/* 初始化内部状态（不动外设，外设初始化在 main.c 的 MX_TIM1/ADC1_Init） */
+/* 初始化内部状态并绑定外设句柄（由 Motor_HW_Init 调用） */
 void FOC_Init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim);
 
 /* 启动流程：零点校准 -> 预定位 -> I-F 强拖 */
