@@ -81,15 +81,15 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	/* USER CODE BEGIN 2 */
-	Motor_HW_Init();
-	FOC_Start();
+	motor_hw_init();
+	foc_start();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		FOC_Task();
+		foc_task();
     	HAL_Delay(1);
     	/* USER CODE END WHILE */
 

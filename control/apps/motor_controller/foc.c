@@ -1,21 +1,17 @@
 /**
-  ******************************************************************************
-  * @file    foc.c
-  * @brief   开环 FOC (I-F 强拖) 核心实现
-  *
-  *  状态机：CAL(零点校准) -> ALIGN(转子预定位) -> RUN(I-F开环强拖)
-  *  电流环 20kHz 在 ADC1 注入组完成中断(JEOC)中执行。
-  ******************************************************************************
-  */
+******************************************************************************
+*  @brief   开环 FOC (I-F 强拖) 核心实现
+*  状态机：CAL(零点校准) -> ALIGN(转子预定位) -> RUN(I-F开环强拖)
+*  电流环 20kHz 在 ADC1 注入组完成中断(JEOC)中执行。
+******************************************************************************
+*/
 #include "foc.h"
 #include <math.h>
 #include <string.h>
-
-#define TWO_PI      6.2831853f
-#define SQRT3_BY_2  0.8660254f
+#define TWO_PI 6.2831853f
+#define SQRT3_BY_2 0.8660254f
 
 foc_t g_foc;
-
 static ADC_HandleTypeDef *s_hadc;
 static TIM_HandleTypeDef *s_htim;
 
@@ -107,7 +103,7 @@ static inline void foc_control_step(float id_ref, float iq_ref)
 /* -------------------------------------------------------------------------- */
 /* 对外接口                                                                     */
 /* -------------------------------------------------------------------------- */
-void FOC_Init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim)
+void foc_init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim)
 {
     memset(&g_foc, 0, sizeof(g_foc));
     s_hadc = hadc;
@@ -142,7 +138,7 @@ static void foc_calibrate_offsets(void)
     g_foc.offset_v = (float)acc_v / (float)CAL_SAMPLE_NUM;
 }
 
-void FOC_Start(void)
+void foc_start(void)
 {
     if (g_foc.state != FOC_STATE_IDLE && g_foc.state != FOC_STATE_FAULT)
         return;
@@ -181,7 +177,7 @@ void FOC_Start(void)
     g_foc.state_tick = HAL_GetTick();
 }
 
-void FOC_Stop(void)
+void foc_stop(void)
 {
     __HAL_TIM_MOE_DISABLE(s_htim);
     HAL_TIM_PWM_Stop(s_htim, TIM_CHANNEL_1);
@@ -196,7 +192,7 @@ void FOC_Stop(void)
 }
 
 /* 20 kHz 热路径：直接读注入数据寄存器，清标志后跑控制 */
-void FOC_ADC_ISR(void)
+void foc_adc_isr(void)
 {
     if (!(ADC1->SR & ADC_SR_JEOC))
         return;
@@ -240,7 +236,7 @@ fault:
 }
 
 /* 1 ms 慢任务：状态机时序 + 速度斜坡 */
-void FOC_Task(void)
+void foc_task(void)
 {
     foc_t *f = &g_foc;
     uint32_t now = HAL_GetTick();

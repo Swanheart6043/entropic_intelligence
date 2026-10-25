@@ -13,7 +13,7 @@ static TIM_HandleTypeDef htim1;
   * @brief TIM1 初始化：中心对齐 PWM 20kHz，三对互补输出 + 死区，
   *        CH4 输出比较事件用作 ADC 注入组触发源
   */
-static void MX_TIM1_Init(void)
+static void mx_tim1_init(void)
 {
 	TIM_OC_InitTypeDef sConfigOC = {0};
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -79,7 +79,7 @@ static void MX_TIM1_Init(void)
 /**
   * @brief ADC1 初始化：注入组(IN0,IN1)由 TIM1_CH4 触发，规则组用于零点校准
   */
-static void MX_ADC1_Init(void)
+static void mx_adc1_init(void)
 {
 	ADC_InjectionConfTypeDef sConfigInjected = {0};
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -168,9 +168,9 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 	}
 }
 
-void Motor_HW_Init(void)
+void motor_hw_init(void)
 {
-    MX_TIM1_Init();
-    MX_ADC1_Init();
-    FOC_Init(&hadc1, &htim1);
+    mx_tim1_init();
+    mx_adc1_init();
+    foc_init(&hadc1, &htim1);
 }

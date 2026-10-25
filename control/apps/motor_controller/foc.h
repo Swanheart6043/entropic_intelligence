@@ -1,20 +1,15 @@
 /**
-  ******************************************************************************
-  * @file    foc.h
-  * @brief   开环 FOC (I-F 强拖) 核心接口
-  *
-  *  控制链路（与经典 I-F 开环启动一致）：
-  *    相电流采样 -> Clarke -> Park(theta强制斜坡) -> Id/Iq
-  *    -> 两个 PI(给定 Id*=0, Iq*=设定) -> Vd/Vq
-  *    -> 反Park -> SVPWM -> TIM1 -> 逆变器 -> PMSM
-  *
-  *  时序：TIM1 CH4 比较事件 -> ADC1 注入组转换 -> JEOC 中断里跑 FOC_ADC_ISR()
-  *       （20 kHz）；FOC_Task() 在主循环里以 1ms 步进跑状态机/速度斜坡。
-  ******************************************************************************
-  */
-#ifndef FOC_H
-#define FOC_H
-
+******************************************************************************
+* @brief 开环 FOC (I-F 强拖) 核心接口
+* 控制链路（与经典 I-F 开环启动一致）：
+*   相电流采样 -> Clarke -> Park(theta强制斜坡) -> Id/Iq
+*   -> 两个 PI(给定 Id*=0, Iq*=设定) -> Vd/Vq
+*   -> 反Park -> SVPWM -> TIM1 -> 逆变器 -> PMSM
+* 时序：TIM1 CH4 比较事件 -> ADC1 注入组转换 -> JEOC 中断里跑 foc_adc_isr()
+*   （20 kHz）foc_task() 在主循环里以 1ms 步进跑状态机/速度斜坡。
+******************************************************************************
+*/
+#pragma once
 #include "stm32f1xx_hal.h"
 #include "foc_config.h"
 
@@ -60,23 +55,21 @@ typedef struct {
 
 extern foc_t g_foc;
 
-/* 初始化内部状态并绑定外设句柄（由 Motor_HW_Init 调用） */
-void FOC_Init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim);
+/* 初始化内部状态并绑定外设句柄（由 motor_hw_init 调用） */
+void foc_init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim);
 
 /* 启动流程：零点校准 -> 预定位 -> I-F 强拖 */
-void FOC_Start(void);
+void foc_start(void);
 
 /* 立即停止 PWM 并回到 IDLE */
-void FOC_Stop(void);
+void foc_stop(void);
 
 /* 20 kHz：在 ADC1 注入组完成中断中调用（热路径，直接读寄存器） */
-void FOC_ADC_ISR(void);
+void foc_adc_isr(void);
 
 /* 1 ms：主循环中调用，跑状态机时序和速度斜坡 */
-void FOC_Task(void);
+void foc_task(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* FOC_H */
