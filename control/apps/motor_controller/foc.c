@@ -194,45 +194,51 @@ void foc_stop(void)
 /* 20 kHz 热路径：直接读注入数据寄存器，清标志后跑控制 */
 void foc_adc_isr(void)
 {
-    if (!(ADC1->SR & ADC_SR_JEOC))
-        return;
+    if (!(ADC1->SR & ADC_SR_JEOC)) return;
     uint16_t raw_u = (uint16_t)ADC1->JDR1;
     uint16_t raw_v = (uint16_t)ADC1->JDR2;
-    ADC1->SR = ~ADC_SR_JEOC;      /* 清 JEOC（写0清除，注意保留位） */
+    // 清 JEOC（写0清除，注意保留位）
+    ADC1->SR = ~ADC_SR_JEOC;
 
     foc_t *f = &g_foc;
 
-    /* counts -> A */
+    // counts -> A
     f->iu = ((float)raw_u - f->offset_u) * ADC_TO_AMP * IU_SIGN;
     f->iv = ((float)raw_v - f->offset_v) * ADC_TO_AMP * IV_SIGN;
     f->iw = -(f->iu + f->iv);
 
-    /* 过流保护 */
-    if (f->iu >  OVERCURRENT_A || f->iu < -OVERCURRENT_A) { f->fault_code = 1; goto fault; }
-    if (f->iv >  OVERCURRENT_A || f->iv < -OVERCURRENT_A) { f->fault_code = 2; goto fault; }
-    if (f->iw >  OVERCURRENT_A || f->iw < -OVERCURRENT_A) { f->fault_code = 3; goto fault; }
-
+    // 过流保护
+    if (f->iu >  OVERCURRENT_A || f->iu < -OVERCURRENT_A) { 
+        f->fault_code = 1; 
+        goto fault; 
+    }
+    if (f->iv >  OVERCURRENT_A || f->iv < -OVERCURRENT_A) { 
+        f->fault_code = 2; 
+        goto fault; 
+    }
+    if (f->iw >  OVERCURRENT_A || f->iw < -OVERCURRENT_A) { 
+        f->fault_code = 3; 
+        goto fault; 
+    }
     switch (f->state) {
-    case FOC_STATE_ALIGN:
-        /* theta 固定 0，d 轴注入电流把转子拉到 0 电角度 */
-        foc_control_step(ALIGN_CURRENT_A, 0.0f);
-        break;
-
-    case FOC_STATE_RUN:
-        /* 电角度强制斜坡 —— 这就是“开环”：角度不靠反馈，靠积分生成 */
-        f->theta += f->omega_e * PWM_TS;
-        if (f->theta >= TWO_PI) f->theta -= TWO_PI;
-        foc_control_step(ID_REF_A, IQ_REF_A);
-        break;
-
-    default:
-        break;
+        case FOC_STATE_ALIGN:
+            /* theta 固定 0，d 轴注入电流把转子拉到 0 电角度 */
+            foc_control_step(ALIGN_CURRENT_A, 0.0f);
+            break;
+        case FOC_STATE_RUN:
+            /* 电角度强制斜坡 —— 这就是“开环”：角度不靠反馈，靠积分生成 */
+            f->theta += f->omega_e * PWM_TS;
+            if (f->theta >= TWO_PI) f->theta -= TWO_PI;
+            foc_control_step(ID_REF_A, IQ_REF_A);
+            break;
+        default:
+            break;
     }
     return;
 
-fault:
-    __HAL_TIM_MOE_DISABLE(s_htim);
-    f->state = FOC_STATE_FAULT;
+    fault:
+        __HAL_TIM_MOE_DISABLE(s_htim);
+        f->state = FOC_STATE_FAULT;
 }
 
 /* 1 ms 慢任务：状态机时序 + 速度斜坡 */
@@ -242,32 +248,30 @@ void foc_task(void)
     uint32_t now = HAL_GetTick();
 
     switch (f->state) {
-    case FOC_STATE_ALIGN:
-        if (now - f->state_tick >= ALIGN_TIME_MS) {
-            /* 预定位完成，清零角度与积分，从 OMEGA_START 开始强拖 */
-            f->theta = 0.0f;
-            f->pi_d_int = 0.0f;
-            f->pi_q_int = 0.0f;
-            f->omega_e = OMEGA_START_RAD;
-            f->state = FOC_STATE_RUN;
-            f->state_tick = now;
+        case FOC_STATE_ALIGN:
+            if (now - f->state_tick >= ALIGN_TIME_MS) {
+                /* 预定位完成，清零角度与积分，从 OMEGA_START 开始强拖 */
+                f->theta = 0.0f;
+                f->pi_d_int = 0.0f;
+                f->pi_q_int = 0.0f;
+                f->omega_e = OMEGA_START_RAD;
+                f->state = FOC_STATE_RUN;
+                f->state_tick = now;
+            }
+            break;
+        case FOC_STATE_RUN: {
+            /* 线性速度斜坡 */
+            float step = (OMEGA_TARGET_RAD - OMEGA_START_RAD) / (float)OMEGA_RAMP_TIME_MS;
+            if (f->omega_e < OMEGA_TARGET_RAD) {
+                f->omega_e += step;
+                if (f->omega_e > OMEGA_TARGET_RAD) f->omega_e = OMEGA_TARGET_RAD;
+            } else if (f->omega_e > OMEGA_TARGET_RAD) {
+                f->omega_e -= step;
+                if (f->omega_e < OMEGA_TARGET_RAD) f->omega_e = OMEGA_TARGET_RAD;
+            }
+            break;
         }
-        break;
-
-    case FOC_STATE_RUN: {
-        /* 线性速度斜坡 */
-        float step = (OMEGA_TARGET_RAD - OMEGA_START_RAD) / (float)OMEGA_RAMP_TIME_MS;
-        if (f->omega_e < OMEGA_TARGET_RAD) {
-            f->omega_e += step;
-            if (f->omega_e > OMEGA_TARGET_RAD) f->omega_e = OMEGA_TARGET_RAD;
-        } else if (f->omega_e > OMEGA_TARGET_RAD) {
-            f->omega_e -= step;
-            if (f->omega_e < OMEGA_TARGET_RAD) f->omega_e = OMEGA_TARGET_RAD;
-        }
-        break;
-    }
-
-    default:
-        break;
+        default:
+            break;
     }
 }
