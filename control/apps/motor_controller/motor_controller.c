@@ -1,4 +1,4 @@
-/** @brief 单电机控制器：算法调度、公共保护和控制事件生命周期。 */
+// 单电机控制器：算法调度、公共保护和控制事件生命周期。
 #include "motor_controller.h"
 #include "motor_algorithm.h"
 #include "motor_config.h"
