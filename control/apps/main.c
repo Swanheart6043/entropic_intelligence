@@ -21,8 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "foc.h"
-#include "motor_hw.h"
+#include "motor_controller.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -81,15 +80,18 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	/* USER CODE BEGIN 2 */
-	motor_hw_init();
-	foc_start();
+	if (motor_controller_init() != MOTOR_RESULT_OK ||
+	    motor_controller_start() != MOTOR_RESULT_OK)
+	{
+		Error_Handler();
+	}
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		foc_task();
+		motor_controller_task();
     	HAL_Delay(1);
     	/* USER CODE END WHILE */
 

@@ -22,7 +22,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "foc.h"
+#include "motor_controller.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,11 +62,11 @@
 /* USER CODE END EV */
 
 /**
-  * @brief ADC1 注入组转换完成中断：20kHz 电流环入口（FOC）
+  * @brief ADC1 注入组转换完成：采样后调度当前控制算法。
   */
 void ADC1_2_IRQHandler(void)
 {
-  foc_adc_isr();
+  motor_controller_adc_isr();
 }
 
 /******************************************************************************/

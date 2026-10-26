@@ -45,7 +45,8 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-    ${CMAKE_CURRENT_SOURCE_DIR}/apps/motor_controller/foc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/apps/motor_controller/motor_controller.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/apps/motor_controller/foc/foc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/apps/motor_controller/motor_hw.c
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c
