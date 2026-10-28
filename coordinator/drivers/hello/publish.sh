@@ -1,0 +1,1 @@
+scp hello.ko rk@<板子IP>:/home/rk/
